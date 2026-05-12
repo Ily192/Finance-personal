@@ -8,109 +8,196 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        fintech: {
+                            dark: '#0f172a', // Pizarra profundo
+                            card: '#1e293b', // Tarjetas oscuras
+                            gold: '#d4af37', // Dorado texturizado / premium
+                            goldHover: '#b5952f',
+                            accent: '#10b981', // Esmeralda para éxito
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Ocultar flechas del input number para una UI más limpia */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans antialiased">
-    <header class="bg-indigo-600 text-white p-4 shadow-md sticky top-0 z-50">
+<body class="bg-gray-100 text-gray-800 font-sans antialiased selection:bg-fintech-gold selection:text-white">
+    
+    <header class="bg-fintech-dark text-white p-5 shadow-lg rounded-b-3xl mb-6 sticky top-0 z-50">
         <div class="max-w-md mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold"><i class="fas fa-wallet mr-2"></i>Finanzas Dashboard</h1>
+            <div>
+                <h1 class="text-2xl font-extrabold tracking-tight">Mis Finanzas</h1>
+                <p class="text-xs text-gray-400 mt-1 font-medium tracking-wider uppercase">Panel de Control</p>
+            </div>
+            <div class="bg-white/10 p-3 rounded-2xl border border-white/5">
+                <i class="fas fa-wallet text-fintech-gold text-xl"></i>
+            </div>
         </div>
     </header>
 
-    <main class="max-w-md mx-auto p-4 pb-24">
+    <main class="max-w-md mx-auto p-4 pb-28">
         
-        <div id="view-registro" class="block">
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 mb-6">
-                <h2 class="text-lg font-bold mb-4 text-gray-700">Nuevo Movimiento</h2>
-                <form id="expenseForm" class="space-y-4">
+        <div id="view-registro" class="block animate-fade-in">
+            <div class="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-6 mb-6 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-fintech-gold to-yellow-200"></div>
+                
+                <h2 class="text-xl font-bold mb-6 text-fintech-dark">Nuevo Movimiento</h2>
+                
+                <form id="expenseForm" class="space-y-5">
                     <div>
-                        <label class="block text-sm font-medium text-gray-600 mb-1">Descripción</label>
-                        <input type="text" id="desc" placeholder="Ej. Mercado, Internet, Repuestos..." class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none" required>
+                        <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">Descripción</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-pen text-gray-400 text-sm"></i>
+                            </div>
+                            <input type="text" id="desc" placeholder="Ej. Mercado, Internet, Repuestos..." class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 pl-10 pr-3 focus:bg-white focus:ring-2 focus:ring-fintech-gold/50 focus:border-fintech-gold outline-none transition-all" required>
+                        </div>
                     </div>
+                    
                     <div class="flex gap-4">
                         <div class="w-1/2">
-                            <label class="block text-sm font-medium text-gray-600 mb-1">Monto ($)</label>
-                            <input type="number" id="amount" step="0.01" placeholder="0.00" class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none" required>
+                            <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">Monto ($)</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-400 font-bold">$</span>
+                                </div>
+                                <input type="number" id="amount" step="0.01" placeholder="0.00" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 pl-8 pr-3 focus:bg-white focus:ring-2 focus:ring-fintech-gold/50 focus:border-fintech-gold outline-none transition-all font-semibold" required>
+                            </div>
                         </div>
                         <div class="w-1/2">
-                            <label class="block text-sm font-medium text-gray-600 mb-1">Categoría</label>
-                            <select id="category" class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none">
-                                <option value="Gastos Fijos">Gasto Fijo</option>
-                                <option value="Gastos Variables">Gasto Variable</option>
-                                <option value="Fondo de Previsiones">Fondo de Previsiones</option>
-                                <option value="Ahorro Personal">Ahorro Personal</option>
-                            </select>
+                            <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">Categoría</label>
+                            <div class="relative">
+                                <select id="category" class="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-3 appearance-none focus:bg-white focus:ring-2 focus:ring-fintech-gold/50 focus:border-fintech-gold outline-none transition-all text-sm font-medium">
+                                    <option value="Gastos Fijos">Fijo</option>
+                                    <option value="Gastos Variables">Variable</option>
+                                    <option value="Fondo de Previsiones">Previsiones</option>
+                                    <option value="Ahorro Personal">Ahorro</option>
+                                </select>
+                                <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-gray-400">
+                                    <i class="fas fa-chevron-down text-xs"></i>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <button type="submit" id="submitBtn" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition mt-2 shadow-md">
-                        Registrar en Sheets
+                    
+                    <button type="submit" id="submitBtn" class="w-full bg-fintech-dark text-fintech-gold font-bold py-4 rounded-xl hover:bg-fintech-card transition-all mt-4 shadow-lg shadow-fintech-dark/20 flex justify-center items-center gap-2">
+                        <span>Registrar en Sheets</span>
+                        <i class="fas fa-arrow-right text-sm"></i>
                     </button>
                 </form>
             </div>
-            <p id="status" class="text-center text-sm font-medium hidden"></p>
+            
+            <div id="status" class="hidden text-center text-sm font-medium p-3 rounded-xl transition-all"></div>
         </div>
 
-        <div id="view-dashboard" class="hidden">
-            <h2 class="text-xl font-bold mb-4 text-gray-800">Resumen del Mes</h2>
+        <div id="view-dashboard" class="hidden animate-fade-in">
+            <h2 class="text-xl font-bold mb-4 text-gray-800 px-1">Resumen Mensual</h2>
             
-            <div class="bg-indigo-600 text-white p-5 rounded-xl shadow-md mb-6">
-                <p class="text-sm opacity-80 mb-1">Total Registrado</p>
-                <h3 class="text-3xl font-bold" id="totalGeneral">$0.00</h3>
+            <div class="bg-fintech-dark text-white p-6 rounded-3xl shadow-xl shadow-fintech-dark/10 mb-6 relative overflow-hidden">
+                <div class="absolute -right-6 -top-6 w-24 h-24 bg-white/5 rounded-full blur-2xl"></div>
+                <p class="text-xs text-gray-400 uppercase tracking-widest font-semibold mb-1">Total Registrado</p>
+                <h3 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300" id="totalGeneral">$0.00</h3>
             </div>
 
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6">
-                <canvas id="myChart" width="400" height="400"></canvas>
+            <div class="bg-white p-5 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] mb-6 flex justify-center items-center">
+                <div class="w-4/5">
+                    <canvas id="myChart" width="400" height="400"></canvas>
+                </div>
             </div>
 
             <div class="space-y-3">
-                <div class="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm border-l-4 border-red-500">
-                    <span class="font-medium">Gastos Fijos</span>
-                    <span class="font-bold" id="totalFijos">$0.00</span>
+                <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-gray-50">
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                        <span class="font-semibold text-gray-700 text-sm">Gastos Fijos</span>
+                    </div>
+                    <span class="font-bold text-gray-900" id="totalFijos">$0.00</span>
                 </div>
-                <div class="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm border-l-4 border-yellow-500">
-                    <span class="font-medium">Gastos Variables</span>
-                    <span class="font-bold" id="totalVariables">$0.00</span>
+                <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-gray-50">
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 rounded-full bg-amber-400"></div>
+                        <span class="font-semibold text-gray-700 text-sm">Gastos Variables</span>
+                    </div>
+                    <span class="font-bold text-gray-900" id="totalVariables">$0.00</span>
                 </div>
-                <div class="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm border-l-4 border-blue-500">
-                    <span class="font-medium">Fondo de Previsiones</span>
-                    <span class="font-bold" id="totalFondos">$0.00</span>
+                <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-gray-50">
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+                        <span class="font-semibold text-gray-700 text-sm">Fondo de Previsiones</span>
+                    </div>
+                    <span class="font-bold text-gray-900" id="totalFondos">$0.00</span>
                 </div>
-                <div class="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm border-l-4 border-green-500">
-                    <span class="font-medium">Ahorro Personal</span>
-                    <span class="font-bold" id="totalAhorros">$0.00</span>
+                <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-gray-50">
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+                        <span class="font-semibold text-gray-700 text-sm">Ahorro Personal</span>
+                    </div>
+                    <span class="font-bold text-gray-900" id="totalAhorros">$0.00</span>
                 </div>
             </div>
         </div>
 
     </main>
 
-    <nav class="fixed bottom-0 w-full bg-white border-t border-gray-200 p-3 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] z-50">
-        <div class="max-w-md mx-auto flex justify-around">
-            <button onclick="switchView('registro')" class="flex flex-col items-center text-indigo-600 w-1/2 transition" id="nav-registro">
-                <i class="fas fa-plus-circle text-xl mb-1"></i>
-                <span class="text-[10px] font-semibold">Registro</span>
+    <nav class="fixed bottom-0 w-full glass-nav border-t border-gray-200/50 pb-safe pt-2 z-50">
+        <div class="max-w-md mx-auto flex justify-around p-2">
+            <button onclick="switchView('registro')" class="flex flex-col items-center text-fintech-dark w-1/2 transition-transform active:scale-95" id="nav-registro">
+                <div class="bg-gray-100 p-2 rounded-xl mb-1" id="icon-bg-registro">
+                    <i class="fas fa-plus text-lg"></i>
+                </div>
+                <span class="text-[10px] font-bold tracking-wide">REGISTRO</span>
             </button>
-            <button onclick="switchView('dashboard')" class="flex flex-col items-center text-gray-400 hover:text-indigo-600 transition w-1/2" id="nav-dashboard">
-                <i class="fas fa-chart-pie text-xl mb-1"></i>
-                <span class="text-[10px] font-semibold">Dashboard</span>
+            <button onclick="switchView('dashboard')" class="flex flex-col items-center text-gray-400 w-1/2 transition-transform active:scale-95" id="nav-dashboard">
+                <div class="p-2 rounded-xl mb-1 transition-colors" id="icon-bg-dashboard">
+                    <i class="fas fa-chart-pie text-lg"></i>
+                </div>
+                <span class="text-[10px] font-bold tracking-wide">DASHBOARD</span>
             </button>
         </div>
     </nav>
 
     <script>
-        // --- NAVEGACIÓN Y RENDERIZADO ---
+        // --- LÓGICA DE NAVEGACIÓN Y RENDERIZADO ---
         function switchView(view) {
             document.getElementById('view-registro').classList.toggle('hidden', view !== 'registro');
             document.getElementById('view-dashboard').classList.toggle('hidden', view !== 'dashboard');
             
-            document.getElementById('nav-registro').classList.toggle('text-indigo-600', view === 'registro');
-            document.getElementById('nav-registro').classList.toggle('text-gray-400', view !== 'registro');
-            document.getElementById('nav-dashboard').classList.toggle('text-indigo-600', view === 'dashboard');
-            document.getElementById('nav-dashboard').classList.toggle('text-gray-400', view !== 'dashboard');
+            // Actualizar Nav Registro
+            const navReg = document.getElementById('nav-registro');
+            const iconBgReg = document.getElementById('icon-bg-registro');
+            navReg.className = view === 'registro' ? "flex flex-col items-center text-fintech-dark w-1/2 transition-transform active:scale-95" : "flex flex-col items-center text-gray-400 w-1/2 transition-transform active:scale-95";
+            iconBgReg.className = view === 'registro' ? "bg-fintech-gold/20 text-fintech-gold p-2 rounded-xl mb-1" : "p-2 rounded-xl mb-1";
+
+            // Actualizar Nav Dashboard
+            const navDash = document.getElementById('nav-dashboard');
+            const iconBgDash = document.getElementById('icon-bg-dashboard');
+            navDash.className = view === 'dashboard' ? "flex flex-col items-center text-fintech-dark w-1/2 transition-transform active:scale-95" : "flex flex-col items-center text-gray-400 w-1/2 transition-transform active:scale-95";
+            iconBgDash.className = view === 'dashboard' ? "bg-fintech-gold/20 text-fintech-gold p-2 rounded-xl mb-1" : "p-2 rounded-xl mb-1";
             
             if(view === 'dashboard') updateDashboard();
         }
 
-        // Base de datos temporal en memoria (Para que el dashboard sume al instante en tu celular)
+        // Inicializar UI de navegación
+        switchView('registro');
+
         let localData = [];
         let myChart;
 
@@ -134,21 +221,29 @@
             
             if (myChart) myChart.destroy();
             
+            // Gráfico más elegante
             myChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Fijos', 'Variables', 'Previsiones', 'Ahorro'],
                     datasets: [{
                         data: dataValues,
-                        backgroundColor: ['#ef4444', '#eab308', '#3b82f6', '#22c55e'],
-                        borderWidth: 0
+                        backgroundColor: ['#ef4444', '#fbbf24', '#3b82f6', '#10b981'],
+                        borderWidth: 0,
+                        hoverOffset: 4
                     }]
                 },
-                options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+                options: { 
+                    responsive: true, 
+                    cutout: '75%', // Hace el anillo más fino y elegante
+                    plugins: { 
+                        legend: { display: false } // Ocultamos la leyenda por defecto para limpiarlo
+                    } 
+                }
             });
         }
 
-        // --- CONEXIÓN AL NUEVO GOOGLE SHEET ---
+        // --- CONEXIÓN A GOOGLE SHEETS ---
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyTRlqNUWqYiOgBDrMz6oz69ORf2nD9VxFdH53tJGl2LDoZO3epzBBerO7FWOUolkN-hA/exec'; 
 
         document.getElementById('expenseForm').addEventListener('submit', async function(e) {
@@ -167,10 +262,8 @@
             const payload = { fecha: date, categoria: category, descripcion: desc, monto: amount };
 
             try {
-                // Guarda localmente para el gráfico
                 localData.push(payload);
                 
-                // Envía al Sheet
                 await fetch(WEB_APP_URL, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -178,16 +271,19 @@
                     body: JSON.stringify(payload)
                 });
 
-                statusMsg.textContent = '¡Registrado con éxito!';
-                statusMsg.className = 'text-center text-sm font-medium text-green-600 mt-2 block';
+                statusMsg.textContent = '¡Registro completado!';
+                statusMsg.className = 'text-center text-sm font-bold text-fintech-dark bg-fintech-gold/20 p-3 rounded-xl mt-4 block';
                 this.reset();
             } catch (error) {
-                statusMsg.textContent = 'Error al registrar.';
-                statusMsg.className = 'text-center text-sm font-medium text-red-600 mt-2 block';
+                statusMsg.textContent = 'Hubo un error de conexión.';
+                statusMsg.className = 'text-center text-sm font-bold text-red-700 bg-red-100 p-3 rounded-xl mt-4 block';
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = 'Registrar en Sheets';
-                setTimeout(() => statusMsg.classList.add('hidden'), 3000);
+                btn.innerHTML = '<span>Registrar</span><i class="fas fa-arrow-right text-sm"></i>';
+                setTimeout(() => {
+                    statusMsg.classList.add('hidden');
+                    statusMsg.classList.remove('block');
+                }, 3000);
             }
         });
     </script>

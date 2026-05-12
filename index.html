@@ -3,67 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis Finanzas</title>
+    <title>Finanzas Smart</title>
     <link rel="manifest" href="manifest.json">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans antialiased">
-    <header class="bg-indigo-600 text-white p-4 shadow-md">
+    <header class="bg-indigo-600 text-white p-4 shadow-md sticky top-0 z-50">
         <div class="max-w-md mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold"><i class="fas fa-wallet mr-2"></i>Finanzas 2025</h1>
+            <h1 class="text-xl font-bold"><i class="fas fa-wallet mr-2"></i>Finanzas Dashboard</h1>
         </div>
     </header>
 
     <main class="max-w-md mx-auto p-4 pb-24">
-        <div class="grid grid-cols-2 gap-4 mb-6">
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold">Fondo Binance</p>
-                <p class="text-xl font-bold text-gray-800 mt-1">$982.30</p>
+        
+        <div id="view-registro" class="block">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 mb-6">
+                <h2 class="text-lg font-bold mb-4 text-gray-700">Nuevo Movimiento</h2>
+                <form id="expenseForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">Descripción</label>
+                        <input type="text" id="desc" placeholder="Ej. Mercado, Internet, Repuestos..." class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none" required>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-1/2">
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Monto ($)</label>
+                            <input type="number" id="amount" step="0.01" placeholder="0.00" class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none" required>
+                        </div>
+                        <div class="w-1/2">
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Categoría</label>
+                            <select id="category" class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <option value="Gastos Fijos">Gasto Fijo</option>
+                                <option value="Gastos Variables">Gasto Variable</option>
+                                <option value="Fondo de Previsiones">Fondo de Previsiones</option>
+                                <option value="Ahorro Personal">Ahorro Personal</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" id="submitBtn" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition mt-2 shadow-md">
+                        Registrar en Sheets
+                    </button>
+                </form>
             </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold">Fondo de Previsiones</p>
-                <p class="text-xl font-bold text-gray-800 mt-1">$309.00</p>
+            <p id="status" class="text-center text-sm font-medium hidden"></p>
+        </div>
+
+        <div id="view-dashboard" class="hidden">
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Resumen del Mes</h2>
+            
+            <div class="bg-indigo-600 text-white p-5 rounded-xl shadow-md mb-6">
+                <p class="text-sm opacity-80 mb-1">Total Registrado</p>
+                <h3 class="text-3xl font-bold" id="totalGeneral">$0.00</h3>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6">
+                <canvas id="myChart" width="400" height="400"></canvas>
+            </div>
+
+            <div class="space-y-3">
+                <div class="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm border-l-4 border-red-500">
+                    <span class="font-medium">Gastos Fijos</span>
+                    <span class="font-bold" id="totalFijos">$0.00</span>
+                </div>
+                <div class="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm border-l-4 border-yellow-500">
+                    <span class="font-medium">Gastos Variables</span>
+                    <span class="font-bold" id="totalVariables">$0.00</span>
+                </div>
+                <div class="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm border-l-4 border-blue-500">
+                    <span class="font-medium">Fondo de Previsiones</span>
+                    <span class="font-bold" id="totalFondos">$0.00</span>
+                </div>
+                <div class="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm border-l-4 border-green-500">
+                    <span class="font-medium">Ahorro Personal</span>
+                    <span class="font-bold" id="totalAhorros">$0.00</span>
+                </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 mb-6">
-            <h2 class="text-lg font-bold mb-4 text-gray-700">Registrar Movimiento</h2>
-            <form id="expenseForm" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-600 mb-1">Descripción</label>
-                    <input type="text" id="desc" placeholder="Ej. Compras suraki, Skin care..." class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none" required>
-                </div>
-                <div class="flex gap-4">
-                    <div class="w-1/2">
-                        <label class="block text-sm font-medium text-gray-600 mb-1">Monto ($)</label>
-                        <input type="number" id="amount" step="0.01" placeholder="0.00" class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none" required>
-                    </div>
-                    <div class="w-1/2">
-                        <label class="block text-sm font-medium text-gray-600 mb-1">Categoría</label>
-                        <select id="category" class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none">
-                            <option value="Gastos Variables">Gasto Variable</option>
-                            <option value="Gastos Fijos">Gasto Fijo</option>
-                            <option value="Ahorros">Ahorro</option>
-                        </select>
-                    </div>
-                </div>
-                <button type="submit" id="submitBtn" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition mt-2 shadow-md">
-                    Registrar
-                </button>
-            </form>
-        </div>
-        <p id="status" class="text-center text-sm font-medium hidden"></p>
     </main>
 
+    <nav class="fixed bottom-0 w-full bg-white border-t border-gray-200 p-3 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] z-50">
+        <div class="max-w-md mx-auto flex justify-around">
+            <button onclick="switchView('registro')" class="flex flex-col items-center text-indigo-600 w-1/2 transition" id="nav-registro">
+                <i class="fas fa-plus-circle text-xl mb-1"></i>
+                <span class="text-[10px] font-semibold">Registro</span>
+            </button>
+            <button onclick="switchView('dashboard')" class="flex flex-col items-center text-gray-400 hover:text-indigo-600 transition w-1/2" id="nav-dashboard">
+                <i class="fas fa-chart-pie text-xl mb-1"></i>
+                <span class="text-[10px] font-semibold">Dashboard</span>
+            </button>
+        </div>
+    </nav>
+
     <script>
-        // Registra el Service Worker para que funcione como App nativa (PWA)
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
+        // --- NAVEGACIÓN Y RENDERIZADO ---
+        function switchView(view) {
+            document.getElementById('view-registro').classList.toggle('hidden', view !== 'registro');
+            document.getElementById('view-dashboard').classList.toggle('hidden', view !== 'dashboard');
+            
+            document.getElementById('nav-registro').classList.toggle('text-indigo-600', view === 'registro');
+            document.getElementById('nav-registro').classList.toggle('text-gray-400', view !== 'registro');
+            document.getElementById('nav-dashboard').classList.toggle('text-indigo-600', view === 'dashboard');
+            document.getElementById('nav-dashboard').classList.toggle('text-gray-400', view !== 'dashboard');
+            
+            if(view === 'dashboard') updateDashboard();
         }
 
-        // URL de tu Google Apps Script (Reemplazar con la tuya)
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyhSLzq69Hr-ever4KQPTb9fJ8jZGYMyy__lQkotGNi3GUsxIde4hQOiY_BUXejNMMVyQ/exec';
+        // Base de datos temporal en memoria (Para que el dashboard sume al instante en tu celular)
+        let localData = [];
+        let myChart;
+
+        function updateDashboard() {
+            let totales = { 'Gastos Fijos': 0, 'Gastos Variables': 0, 'Fondo de Previsiones': 0, 'Ahorro Personal': 0 };
+            let granTotal = 0;
+
+            localData.forEach(item => {
+                totales[item.categoria] += item.monto;
+                granTotal += item.monto;
+            });
+
+            document.getElementById('totalGeneral').innerText = `$${granTotal.toFixed(2)}`;
+            document.getElementById('totalFijos').innerText = `$${totales['Gastos Fijos'].toFixed(2)}`;
+            document.getElementById('totalVariables').innerText = `$${totales['Gastos Variables'].toFixed(2)}`;
+            document.getElementById('totalFondos').innerText = `$${totales['Fondo de Previsiones'].toFixed(2)}`;
+            document.getElementById('totalAhorros').innerText = `$${totales['Ahorro Personal'].toFixed(2)}`;
+
+            const ctx = document.getElementById('myChart').getContext('2d');
+            const dataValues = [totales['Gastos Fijos'], totales['Gastos Variables'], totales['Fondo de Previsiones'], totales['Ahorro Personal']];
+            
+            if (myChart) myChart.destroy();
+            
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Fijos', 'Variables', 'Previsiones', 'Ahorro'],
+                    datasets: [{
+                        data: dataValues,
+                        backgroundColor: ['#ef4444', '#eab308', '#3b82f6', '#22c55e'],
+                        borderWidth: 0
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+            });
+        }
+
+        // --- CONEXIÓN AL NUEVO GOOGLE SHEET ---
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyTRlqNUWqYiOgBDrMz6oz69ORf2nD9VxFdH53tJGl2LDoZO3epzBBerO7FWOUolkN-hA/exec'; 
 
         document.getElementById('expenseForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -71,25 +157,23 @@
             const btn = document.getElementById('submitBtn');
             const statusMsg = document.getElementById('status');
             const desc = document.getElementById('desc').value;
-            const amount = document.getElementById('amount').value;
+            const amount = parseFloat(document.getElementById('amount').value);
             const category = document.getElementById('category').value;
-            const date = new Date().toLocaleDateString('es-ES'); // Formato DD/MM/YYYY
+            const date = new Date().toLocaleDateString('es-ES');
 
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
 
-            const payload = {
-                fecha: date,
-                categoria: category,
-                descripcion: desc,
-                monto: `$${amount}`
-            };
+            const payload = { fecha: date, categoria: category, descripcion: desc, monto: amount };
 
             try {
-                // Se envía por método POST. Funciona perfecto si usas un webhook de n8n o Apps Script
+                // Guarda localmente para el gráfico
+                localData.push(payload);
+                
+                // Envía al Sheet
                 await fetch(WEB_APP_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // Evita bloqueos de CORS de Google
+                    mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
@@ -102,7 +186,7 @@
                 statusMsg.className = 'text-center text-sm font-medium text-red-600 mt-2 block';
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = 'Registrar';
+                btn.innerHTML = 'Registrar en Sheets';
                 setTimeout(() => statusMsg.classList.add('hidden'), 3000);
             }
         });

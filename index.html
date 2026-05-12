@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Finanzas</title>
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+    <header class="bg-indigo-600 text-white p-4 shadow-md">
+        <div class="max-w-md mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold"><i class="fas fa-wallet mr-2"></i>Finanzas 2025</h1>
+        </div>
+    </header>
+
+    <main class="max-w-md mx-auto p-4 pb-24">
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold">Fondo Binance</p>
+                <p class="text-xl font-bold text-gray-800 mt-1">$982.30</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                <p class="text-xs text-gray-500 uppercase tracking-wide font-semibold">Fondo de Previsiones</p>
+                <p class="text-xl font-bold text-gray-800 mt-1">$309.00</p>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 mb-6">
+            <h2 class="text-lg font-bold mb-4 text-gray-700">Registrar Movimiento</h2>
+            <form id="expenseForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Descripción</label>
+                    <input type="text" id="desc" placeholder="Ej. Compras suraki, Skin care..." class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none" required>
+                </div>
+                <div class="flex gap-4">
+                    <div class="w-1/2">
+                        <label class="block text-sm font-medium text-gray-600 mb-1">Monto ($)</label>
+                        <input type="number" id="amount" step="0.01" placeholder="0.00" class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none" required>
+                    </div>
+                    <div class="w-1/2">
+                        <label class="block text-sm font-medium text-gray-600 mb-1">Categoría</label>
+                        <select id="category" class="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <option value="Gastos Variables">Gasto Variable</option>
+                            <option value="Gastos Fijos">Gasto Fijo</option>
+                            <option value="Ahorros">Ahorro</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" id="submitBtn" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition mt-2 shadow-md">
+                    Registrar
+                </button>
+            </form>
+        </div>
+        <p id="status" class="text-center text-sm font-medium hidden"></p>
+    </main>
+
+    <script>
+        // Registra el Service Worker para que funcione como App nativa (PWA)
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+
+        // URL de tu Google Apps Script (Reemplazar con la tuya)
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyhSLzq69Hr-ever4KQPTb9fJ8jZGYMyy__lQkotGNi3GUsxIde4hQOiY_BUXejNMMVyQ/exec';
+
+        document.getElementById('expenseForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const btn = document.getElementById('submitBtn');
+            const statusMsg = document.getElementById('status');
+            const desc = document.getElementById('desc').value;
+            const amount = document.getElementById('amount').value;
+            const category = document.getElementById('category').value;
+            const date = new Date().toLocaleDateString('es-ES'); // Formato DD/MM/YYYY
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+
+            const payload = {
+                fecha: date,
+                categoria: category,
+                descripcion: desc,
+                monto: `$${amount}`
+            };
+
+            try {
+                // Se envía por método POST. Funciona perfecto si usas un webhook de n8n o Apps Script
+                await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Evita bloqueos de CORS de Google
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                statusMsg.textContent = '¡Registrado con éxito!';
+                statusMsg.className = 'text-center text-sm font-medium text-green-600 mt-2 block';
+                this.reset();
+            } catch (error) {
+                statusMsg.textContent = 'Error al registrar.';
+                statusMsg.className = 'text-center text-sm font-medium text-red-600 mt-2 block';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Registrar';
+                setTimeout(() => statusMsg.classList.add('hidden'), 3000);
+            }
+        });
+    </script>
+</body>
+</html>
